@@ -1,14 +1,14 @@
-import test from "tape"
+import test from 'tape'
 import _ from 'lodash'
 import mongoose from 'mongoose'
-import mongooseKeywords from "../src"
+import mongooseKeywords from '../src'
 
 mongoose.connect('mongodb://localhost/mongoose-keywords-test')
 
-test("mongooseKeywords no path", (t) => {
+test('mongooseKeywords no path', (t) => {
   t.plan(2)
 
-  let TestSchema = new mongoose.Schema({name: String})
+  const TestSchema = new mongoose.Schema({name: String})
 
   t.false(TestSchema.path('keywords'), 'should not have keywords path before plugin')
 
@@ -17,9 +17,42 @@ test("mongooseKeywords no path", (t) => {
   t.false(TestSchema.path('keywords'), 'should not have keywords path after plugin')
 })
 
-test("mongooseKeywords single path", (t) => {
+test('mongooseKeywords field option', (t) => {
+  t.plan(3)
+
+  const TestSchema = new mongoose.Schema({name: String})
+
+  t.false(TestSchema.path('keywords'), 'should not have keywords path before plugin')
+
+  TestSchema.plugin(mongooseKeywords, {paths: ['name'], field: 'terms'})
+
+  t.false(TestSchema.path('keywords'), 'should not have keywords path')
+  t.true(TestSchema.path('terms'), 'should have terms path')
+})
+
+test('mongooseKeywords transform option', (t) => {
+  t.plan(3)
+
+  const TestSchema = new mongoose.Schema({name: String})
+
+  t.false(TestSchema.path('keywords'), 'should not have keywords path before plugin')
+
+  TestSchema.plugin(mongooseKeywords, {
+    paths: ['name'],
+    transform: (value) => `${value}!!!`})
+
+  t.true(TestSchema.path('keywords'), 'should have keywords path after plugin')
+
+  const Test = mongoose.model('Test14', TestSchema)
+  const object = new Test()
+  object.name = 'test'
+
+  t.same(_.toArray(object.keywords), ['test!!!'], 'should apply custom transform function')
+})
+
+test('mongooseKeywords single path', (t) => {
   t.plan(6)
-  let TestSchema = new mongoose.Schema({name: String})
+  const TestSchema = new mongoose.Schema({name: String})
 
   t.false(TestSchema.path('keywords'), 'should not have keywords path before plugin')
 
@@ -27,10 +60,10 @@ test("mongooseKeywords single path", (t) => {
 
   t.true(TestSchema.path('keywords'), 'should have keywords path after plugin')
 
-  let Test = mongoose.model('Test1', TestSchema)
+  const Test = mongoose.model('Test1', TestSchema)
 
   Test.remove({}).then(() => {
-    let doc = new Test()
+    const doc = new Test()
 
     doc.name = 'Test'
     t.same(_.toArray(doc.keywords), ['test'], 'should set keywords path after set any path')
@@ -46,9 +79,9 @@ test("mongooseKeywords single path", (t) => {
   }).catch(console.log)
 })
 
-test("mongooseKeywords single path array", (t) => {
+test('mongooseKeywords single path array', (t) => {
   t.plan(3)
-  let TestSchema = new mongoose.Schema({name: [String]})
+  const TestSchema = new mongoose.Schema({name: [String]})
 
   t.false(TestSchema.path('keywords'), 'should not have keywords path before plugin')
 
@@ -56,20 +89,20 @@ test("mongooseKeywords single path array", (t) => {
 
   t.true(TestSchema.path('keywords'), 'should have keywords path after plugin')
 
-  let Test = mongoose.model('Test15', TestSchema)
+  const Test = mongoose.model('Test15', TestSchema)
 
   Test.remove({}).then(() => {
-    let doc = new Test()
+    const doc = new Test()
 
     doc.name.push('Test', 'Hello')
     t.same(_.toArray(doc.keywords), ['test', 'hello'], 'should set keywords path after set any path')
   }).catch(console.log)
 })
 
-test("mongooseKeywords multiple path", (t) => {
+test('mongooseKeywords multiple path', (t) => {
   t.plan(4)
 
-  let TestSchema = new mongoose.Schema({
+  const TestSchema = new mongoose.Schema({
     name: String,
     genre: String
   })
@@ -80,10 +113,10 @@ test("mongooseKeywords multiple path", (t) => {
 
   t.true(TestSchema.path('keywords'), 'should have keywords path after plugin')
 
-  let Test = mongoose.model('Test2', TestSchema)
+  const Test = mongoose.model('Test2', TestSchema)
 
   Test.remove({}).then(() => {
-    let doc = new Test()
+    const doc = new Test()
     doc.name = 'Test'
 
     t.same(_.toArray(doc.keywords), ['test'], 'should set keywords path after set any path')
@@ -94,10 +127,10 @@ test("mongooseKeywords multiple path", (t) => {
   }).catch(console.log)
 })
 
-test("mongooseKeywords multiple path with model", (t) => {
+test('mongooseKeywords multiple path with model', (t) => {
   t.plan(5)
 
-  let TestSchema = new mongoose.Schema({
+  const TestSchema = new mongoose.Schema({
     name: String,
     reference: {
       type: mongoose.Schema.ObjectId,
@@ -111,11 +144,11 @@ test("mongooseKeywords multiple path with model", (t) => {
 
   t.true(TestSchema.path('keywords'), 'should have keywords path after plugin')
 
-  let Test3 = mongoose.model('Test3', TestSchema)
-  let Test1 = mongoose.model('Test1')
+  const Test3 = mongoose.model('Test3', TestSchema)
+  const Test1 = mongoose.model('Test1')
 
   Test3.remove({}).then(() => {
-    let doc = new Test3()
+    const doc = new Test3()
 
     doc.name = 'Test'
     t.same(_.toArray(doc.keywords), ['test'], 'should set keywords path after set any path')

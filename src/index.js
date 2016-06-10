@@ -1,41 +1,37 @@
 import _ from 'lodash'
 import {SchemaTypes} from 'mongoose'
 
-function normalize (value) {
-  return _.kebabCase(value).replace(/\-/g, ' ')
-}
+const normalize = (value) => _.kebabCase(value).replace(/\-/g, ' ')
 
-export default function keywordsPlugin (schema, options = {}) {
-  let paths = options.paths && options.paths.map((p) => schema.path(p))
-  let field = options.field || 'keywords'
+const keywordsPlugin = (schema, {paths, field = 'keywords', transform = normalize} = {}) => {
+  paths = paths && paths.map((p) => schema.path(p))
 
-  if (paths && paths.length) {
-    schema.add({
-      [field]: {
-        type: [String],
-        index: true
-      }
-    })
-  } else {
-    return
-  }
+  if (!paths || !paths.length) return
+
+  schema.add({
+    [field]: {
+      type: [String],
+      index: true
+    }
+  })
 
   paths.forEach((path) => {
     schema.path(path.path).set(function (value) {
-      let oldValue = this[path.path]
-      let parsePath = (path, value) => {
+      const oldValue = this[path.path]
+
+      if (value === oldValue) return value
+
+      const parsePath = (path, value) => {
         if (path instanceof SchemaTypes.ObjectId) {
           value[field] && value[field].forEach((keyword) => {
             oldValue && oldValue[field] && this[field].pull(...oldValue[field])
             this[field].addToSet(keyword)
           })
         } else {
-          oldValue && this[field].pull(normalize(oldValue))
-          this[field].addToSet(normalize(value))
+          oldValue && this[field].pull(transform(oldValue))
+          this[field].addToSet(transform(value))
         }
       }
-
-      if (value === oldValue) return value
 
       if (path instanceof SchemaTypes.Array) {
         value.forEach((val) => {
@@ -49,3 +45,5 @@ export default function keywordsPlugin (schema, options = {}) {
     })
   })
 }
+
+export default keywordsPlugin

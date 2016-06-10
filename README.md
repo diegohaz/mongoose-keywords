@@ -59,7 +59,7 @@ var ArtistSchema = new mongoose.Schema({
 });
 
 ArtistSchema.plugin(require('mongoose-keywords'), {
-  paths: ['name'], 
+  paths: ['name'],
   field: 'terms'
 });
 
@@ -68,6 +68,28 @@ var Artist = mongoose.model('Artist', ArtistSchema);
 var artist = new Artist({name: "L'arc~en~Ciel"});
 console.log(artist.keywords); // undefined
 console.log(artist.terms); // ['larc en ciel']
+```
+
+### Custom `transform` option
+By default, `mongoose-keywords` normalizes the value, but you can provide your own transform function.
+```js
+var mongoose = require('mongoose');
+
+var ArtistSchema = new mongoose.Schema({
+  name: String
+});
+
+ArtistSchema.plugin(require('mongoose-keywords'), {
+  paths: ['name'],
+  transform: function (value) {
+    return value + '!!!';
+  }
+});
+
+var Artist = mongoose.model('Artist', ArtistSchema);
+
+var artist = new Artist({name: "L'arc~en~Ciel"});
+console.log(artist.keywords); // ["L'arc~en~Ciel!!!"]
 ```
 
 ### Nested models
