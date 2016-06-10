@@ -47,3 +47,5 @@ const keywordsPlugin = (schema, {paths, field = 'keywords', transform = normaliz
 }
 
 export default keywordsPlugin
+
+module.exports = exports = keywordsPlugin
