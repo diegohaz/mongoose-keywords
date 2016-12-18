@@ -1,6 +1,6 @@
 {
   "name": "mongoose-keywords",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Mongoose plugin that recursively generates keywords for documents based on its fields",
   "main": "dist/index.js",
   "files": [
