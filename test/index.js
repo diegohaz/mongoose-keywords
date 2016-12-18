@@ -30,6 +30,23 @@ test('mongooseKeywords field option', (t) => {
   t.true(TestSchema.path('terms'), 'should have terms path')
 })
 
+test('mongooseKeywords already defined path', (t) => {
+  t.plan(2)
+
+  const TestSchema = new mongoose.Schema({
+    name: String,
+    keywords: {
+      type: String,
+      unique: true
+    }
+  })
+
+  TestSchema.plugin(mongooseKeywords, {paths: ['name']})
+
+  t.same(TestSchema.path('keywords').options.type, [String], 'should not override type')
+  t.true(TestSchema.path('keywords').options.unique, 'should have unique option')
+})
+
 test('mongooseKeywords transform option', (t) => {
   t.plan(3)
 
