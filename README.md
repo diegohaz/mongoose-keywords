@@ -35,8 +35,6 @@ console.log(artist.keywords); // ['larc en ciel']
 
 ### Multiple path
 ```js
-var mongoose = require('mongoose');
-
 var ArtistSchema = new mongoose.Schema({
   name: String,
   genre: String
@@ -50,10 +48,22 @@ var artist = new Artist({name: "L'arc~en~Ciel", genre: 'Jrock'});
 console.log(artist.keywords); // ['larc en ciel', 'jrock']
 ```
 
+### Custom `keywords` path options
+You can still define a `keywords` path on your schema with predefined options.
+```js
+var ArtistSchema = new mongoose.Schema({
+  name: String,
+  keywords: {
+    type: [String],
+    unique: true // new custom option
+  }
+});
+
+ArtistSchema.plugin(require('mongoose-keywords'), {paths: ['name']});
+```
+
 ### Custom `keywords` field
 ```js
-var mongoose = require('mongoose');
-
 var ArtistSchema = new mongoose.Schema({
   name: String
 });

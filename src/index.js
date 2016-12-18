@@ -9,10 +9,10 @@ const keywordsPlugin = (schema, {paths, field = 'keywords', transform = normaliz
   if (!paths || !paths.length) return
 
   schema.add({
-    [field]: {
+    [field]: _.assign({}, schema.tree[field], {
       type: [String],
       index: true
-    }
+    })
   })
 
   paths.forEach((path) => {
