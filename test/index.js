@@ -201,7 +201,7 @@ test('mongooseKeywords findOne by non _id path', async (t) => {
   const found = await Test.findOne({ name: doc.name })
   const arr = ['test', 'rock']
   const major = mongoose.version.charAt(0)
-  if(major < 5) {
+  if (major < 5) {
     arr.sort()
   }
 
