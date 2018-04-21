@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import mongoose from 'mongoose'
+import { Query, SchemaTypes } from 'mongoose'
 
 const normalize = (value) => _.kebabCase(value).replace(/\-/g, ' ')
 
@@ -17,7 +17,7 @@ const keywordsPlugin = (schema, {paths, field = 'keywords', transform = normaliz
 
   paths.forEach((path) => {
     schema.path(path.path).set(function (value) {
-      if (this instanceof mongoose.Query) {
+      if (this instanceof Query) {
         return value
       }
       const oldValue = this[path.path]
@@ -25,7 +25,7 @@ const keywordsPlugin = (schema, {paths, field = 'keywords', transform = normaliz
       if (value === oldValue) return value
 
       const parsePath = (path, value) => {
-        if (path instanceof mongoose.SchemaTypes.ObjectId) {
+        if (path instanceof SchemaTypes.ObjectId) {
           value[field] && value[field].forEach((keyword) => {
             oldValue && oldValue[field] && this[field].pull(...oldValue[field])
             this[field].addToSet(keyword)
@@ -36,7 +36,7 @@ const keywordsPlugin = (schema, {paths, field = 'keywords', transform = normaliz
         }
       }
 
-      if (path instanceof mongoose.SchemaTypes.Array) {
+      if (path instanceof SchemaTypes.Array) {
         value.forEach((val) => {
           parsePath(path.caster, val)
         })
