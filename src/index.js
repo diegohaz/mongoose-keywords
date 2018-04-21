@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import {SchemaTypes} from 'mongoose'
+import { Query, SchemaTypes } from 'mongoose'
 
 const normalize = (value) => _.kebabCase(value).replace(/\-/g, ' ')
 
@@ -17,6 +17,9 @@ const keywordsPlugin = (schema, {paths, field = 'keywords', transform = normaliz
 
   paths.forEach((path) => {
     schema.path(path.path).set(function (value) {
+      if (this instanceof Query) {
+        return value
+      }
       const oldValue = this[path.path]
 
       if (value === oldValue) return value

@@ -178,6 +178,48 @@ test('mongooseKeywords multiple path with model', (t) => {
   }).catch(console.log)
 })
 
+test('mongooseKeywords findOne by non _id path', (t) => {
+  t.plan(1)
+
+  const TestSchema = new mongoose.Schema({
+    name: String,
+    genre: String
+  })
+
+  TestSchema.plugin(mongooseKeywords, {paths: ['name', 'genre']})
+
+  const Test = mongoose.model('TestFindOne', TestSchema)
+
+  const doc = {
+    name: 'Test',
+    genre: 'Rock'
+  }
+
+  function create() {
+    return Test.create(doc)
+  }
+
+  function find() {
+    return Test.findOne({ name: doc.name })
+  }
+
+  function testResults(found) {
+    const arr = ['test', 'rock']
+    const major = mongoose.version.charAt(0)
+    if (major < 5) {
+      arr.sort()
+    }
+
+    t.same(_.toArray(found.keywords), arr, 'should work with findone by name')
+  }
+
+  Test.remove({})
+    .then(create)
+    .then(find)
+    .then(testResults).catch(console.error)
+
+})
+
 test.onFinish(() => {
   mongoose.disconnect()
 })
