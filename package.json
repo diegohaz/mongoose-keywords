@@ -55,7 +55,7 @@
     "doctoc": "*",
     "eslint": "*",
     "isparta": "*",
-    "mongoose": "^4.7.8",
+    "mongoose": "^5.0.15",
     "rimraf": "*",
     "tap-spec": "*",
     "tape": "*",
