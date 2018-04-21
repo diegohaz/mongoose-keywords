@@ -198,8 +198,14 @@ test('mongooseKeywords findOne by non _id path', async (t) => {
   await Test.remove({})
   await doc.save()
   
-  let found = await Test.findOne({ name: doc.name }).catch(console.log)
-  t.same(_.toArray(found.keywords), ['test', 'rock'], 'should work with findone by name')
+  const found = await Test.findOne({ name: doc.name })
+  const arr = ['test', 'rock']
+  const major = mongoose.version.charAt(0)
+  if(major < 5) {
+    arr.sort()
+  }
+
+  t.same(_.toArray(found.keywords), arr, 'should work with findone by name')
 })
 
 test.onFinish(() => {
