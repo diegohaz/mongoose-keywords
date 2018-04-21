@@ -178,6 +178,30 @@ test('mongooseKeywords multiple path with model', (t) => {
   }).catch(console.log)
 })
 
+test('mongooseKeywords findOne by non _id path', async (t) => {
+  t.plan(1)
+
+  const TestSchema = new mongoose.Schema({
+    name: String,
+    genre: String
+  })
+
+  TestSchema.plugin(mongooseKeywords, {paths: ['name', 'genre']})
+
+  const Test = mongoose.model('TestFindOne', TestSchema)
+
+  const doc = new Test({
+    name: 'Test',
+    genre: 'Rock'
+  })
+
+  await Test.remove({})
+  await doc.save()
+  
+  let found = await Test.findOne({ name: doc.name }).catch(console.log)
+  t.same(_.toArray(found.keywords), ['test', 'rock'], 'should work with findone by name')
+})
+
 test.onFinish(() => {
   mongoose.disconnect()
 })
