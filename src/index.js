@@ -25,14 +25,16 @@ const keywordsPlugin = (schema, {paths, field = 'keywords', transform = normaliz
       if (value === oldValue) return value
 
       const parsePath = (path, value) => {
-        if (path instanceof SchemaTypes.ObjectId) {
-          value[field] && value[field].forEach((keyword) => {
-            oldValue && oldValue[field] && this[field].pull(...oldValue[field])
-            this[field].addToSet(keyword)
-          })
-        } else {
-          oldValue && this[field].pull(transform(oldValue))
-          this[field].addToSet(transform(value))
+        if (this[field]) {  // on create - document might not be populated
+          if (path instanceof SchemaTypes.ObjectId) {
+            value[field] && value[field].forEach((keyword) => {
+              oldValue && oldValue[field] && this[field].pull(...oldValue[field])
+              this[field].addToSet(keyword)
+            })
+          } else {
+            oldValue && this[field].pull(transform(oldValue))
+            this[field].addToSet(transform(value))
+          }
         }
       }
 
